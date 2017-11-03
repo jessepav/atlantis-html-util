@@ -1,0 +1,11 @@
+Usage: FormatAtlantisHTML [options] <input html file> [input html file...]
+
+Options:
+  -w,--width     <body width>
+  -t,--fontsize  <font_size_threshold #1,#2,#3>
+  -f,--threshold <font_size_adjustment #1,#2,#3>
+
+Font Size and Threshold Options:
+ + sizes smaller than threshold #1 will be increased by adjustment #1
+ + sizes smaller than threshold #2 will be increased by adjustment #2
+ + sizes smaller than threshold #3 will be *set to* adjustment #3

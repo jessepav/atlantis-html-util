@@ -1,4 +1,5 @@
 .idea
+resources
 scripts
 src
 manual-utils.iml

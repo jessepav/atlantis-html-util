@@ -1,6 +1,6 @@
 package com.humidmail.utils.manual;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
@@ -15,6 +15,8 @@ public class FormatAtlantisHTML
     private static int bodyWidth;
     private static float[] fontSizeAdjustment, fontSizeThreshold;
 
+    private static String usageText;
+
     public static void main(String[] args) throws IOException {
         CmdLineParser parser = new CmdLineParser();
         Option<Integer> width = parser.addIntegerOption('w', "width");
@@ -25,12 +27,12 @@ public class FormatAtlantisHTML
             parser.parse(args);
         } catch (CmdLineParser.OptionException e) {
             println(e.getMessage());
-            usage();
+            println(getUsageText());
             System.exit(2);
         }
         String[] files = parser.getRemainingArgs();
         if (parser.getOptionValue(help, Boolean.FALSE) || files.length == 0) {
-            usage();
+            println(getUsageText());
             System.exit(1);
         }
         bodyWidth = parser.getOptionValue(width, Integer.valueOf(750));
@@ -60,18 +62,13 @@ public class FormatAtlantisHTML
         }
     }
 
-    private static void usage() {
-        println("Usage: FormatAtlantisHTML [options] <input html file> [input html file...]\n" +
-            "\n" +
-            "Options:\n" +
-            "    -w <body width>\n" +
-            "    -t <font_size_threshold #1,#2,#3>]\n" +
-            "    -f <font_size_adjustment #1,#2,#3>\n" +
-            "\n" +
-            "HTML font sizes smaller than font_size_threshold #1 will be increased\n" +
-            "by font_size_adjustment #1; sizes smaller than font_size_threshold #2 will\n" +
-            "be increased by font_size_adjustment #2; and sizes smaller than\n" +
-            "font_size_threshold #3 will be *set* to font_size_adjustment #3.");
+    private static String getUsageText() throws UnsupportedEncodingException {
+        if (usageText == null) {
+            InputStream in = FormatAtlantisHTML.class.getResourceAsStream("/resources/usage.txt");
+            Reader reader = new InputStreamReader(in, "UTF-8");
+            usageText = slurpReaderText(reader, 1024);
+        }
+        return usageText;
     }
 
     private static final Pattern fontSizePattern = Pattern.compile("font-size\\s{0,2}:{0,2}(\\d[\\d\\.]*)pt");
@@ -147,5 +144,27 @@ public class FormatAtlantisHTML
 
     static void println(String msg) {
         System.out.println(msg);
+    }
+
+    public static String slurpReaderText(Reader r, int bufferSize) {
+        String s = null;
+        BufferedReader reader = null;
+        try {
+            try {
+                reader = new BufferedReader(r);
+                char [] buffer = new char[bufferSize];
+                StringBuilder sb = new StringBuilder(5*bufferSize);
+                int n;
+                while ((n = reader.read(buffer, 0, buffer.length)) != -1)
+                    sb.append(buffer, 0, n);
+                s = sb.toString();
+            } finally {
+                if (reader != null)
+                    reader.close();
+            }
+        } catch (IOException ex) {
+            s = null;
+        }
+        return s;
     }
 }
