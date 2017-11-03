@@ -66,7 +66,7 @@ public class FormatAtlantisHTML
         if (usageText == null) {
             InputStream in = FormatAtlantisHTML.class.getResourceAsStream("/resources/usage.txt");
             Reader reader = new InputStreamReader(in, "UTF-8");
-            usageText = slurpReaderText(reader, 1024);
+            usageText = slurpReaderText(reader, 256);
         }
         return usageText;
     }
@@ -147,23 +147,17 @@ public class FormatAtlantisHTML
     }
 
     public static String slurpReaderText(Reader r, int bufferSize) {
-        String s = null;
-        BufferedReader reader = null;
-        try {
-            try {
-                reader = new BufferedReader(r);
-                char [] buffer = new char[bufferSize];
-                StringBuilder sb = new StringBuilder(5*bufferSize);
-                int n;
-                while ((n = reader.read(buffer, 0, buffer.length)) != -1)
-                    sb.append(buffer, 0, n);
-                s = sb.toString();
-            } finally {
-                if (reader != null)
-                    reader.close();
-            }
+        String s = "";
+        try (BufferedReader br = new BufferedReader(r)) {
+            char [] buffer = new char[bufferSize];
+            StringBuilder sb = new StringBuilder(5*bufferSize);
+            int n;
+            while ((n = br.read(buffer, 0, buffer.length)) != -1)
+                sb.append(buffer, 0, n);
+            s = sb.toString();
         } catch (IOException ex) {
-            s = null;
+            // It's fine to do nothing and let the default empty string value of
+            // 's' be returned.
         }
         return s;
     }
