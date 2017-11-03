@@ -3,3 +3,4 @@ resources
 scripts
 src
 manual-utils.iml
+manual-utils-build.*

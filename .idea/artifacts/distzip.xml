@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact name="distzip">
+    <output-path>$PROJECT_DIR$/build/dist</output-path>
+    <root id="root">
+      <element id="archive" name="FormatAtlantisHTML.zip">
+        <element id="artifact" artifact-name="buildjar" />
+      </element>
+    </root>
+  </artifact>
+</component>

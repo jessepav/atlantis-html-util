@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact name="manual-utils:jar">
+  <artifact name="buildjar">
     <output-path>$PROJECT_DIR$/build/jar</output-path>
     <root id="root">
       <element id="archive" name="manual-utils.jar">

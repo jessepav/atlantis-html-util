@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="trunk" default="all">
+  
+  
+  <property file="manual-utils-build.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="128m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.pyc/**"/>
+    <exclude name="**/.pyo/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/*.lib/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/*.rbc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.zip"/>
+    <include name="*.apk"/>
+    <include name="*.war"/>
+    <include name="*.egg"/>
+    <include name="*.ear"/>
+    <include name="*.ane"/>
+    <include name="*.swc"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+  </patternset>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="library.jargs.classpath">
+    <pathelement location="${basedir}/lib/jargs.jar"/>
+  </path>
+  
+  <!-- Modules -->
+  
+  
+  <!-- Module manual-utils -->
+  
+  <dirname property="module.manual-utils.basedir" file="${ant.file}"/>
+  
+  
+  
+  <property name="compiler.args.manual-utils" value="${compiler.args}"/>
+  
+  <property name="manual-utils.output.dir" value="${module.manual-utils.basedir}/build/classes"/>
+  <property name="manual-utils.testoutput.dir" value="${module.manual-utils.basedir}/build/test"/>
+  
+  <path id="manual-utils.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="manual-utils.module.production.classpath">
+    <path refid="library.jargs.classpath"/>
+  </path>
+  
+  <path id="manual-utils.runtime.production.module.classpath">
+    <pathelement location="${manual-utils.output.dir}"/>
+    <path refid="library.jargs.classpath"/>
+  </path>
+  
+  <path id="manual-utils.module.classpath">
+    <pathelement location="${manual-utils.output.dir}"/>
+    <path refid="library.jargs.classpath"/>
+  </path>
+  
+  <path id="manual-utils.runtime.module.classpath">
+    <pathelement location="${manual-utils.testoutput.dir}"/>
+    <pathelement location="${manual-utils.output.dir}"/>
+    <path refid="library.jargs.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.manual-utils">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.manual-utils">
+    <patternset refid="excluded.from.module.manual-utils"/>
+  </patternset>
+  
+  <path id="manual-utils.module.sourcepath">
+    <dirset dir="${module.manual-utils.basedir}">
+      <include name="src"/>
+      <include name="resources"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.manual-utils" depends="compile.module.manual-utils.production,compile.module.manual-utils.tests" description="Compile module manual-utils"/>
+  
+  <target name="compile.module.manual-utils.production" description="Compile module manual-utils; production classes">
+    <mkdir dir="${manual-utils.output.dir}"/>
+    <javac destdir="${manual-utils.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+      <compilerarg line="${compiler.args.manual-utils}"/>
+      <bootclasspath refid="manual-utils.module.bootclasspath"/>
+      <classpath refid="manual-utils.module.production.classpath"/>
+      <src refid="manual-utils.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.manual-utils"/>
+    </javac>
+    
+    <copy todir="${manual-utils.output.dir}">
+      <fileset dir="${module.manual-utils.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+    <copy todir="${manual-utils.output.dir}/resources">
+      <fileset dir="${module.manual-utils.basedir}/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.manual-utils.tests" depends="compile.module.manual-utils.production" description="compile module manual-utils; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.manual-utils" description="cleanup module">
+    <delete dir="${manual-utils.output.dir}"/>
+    <delete dir="${manual-utils.testoutput.dir}"/>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.manual-utils, clean.artifact.buildjar, clean.artifact.distzip" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.manual-utils" description="build all modules"/>
+  
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.buildjar" value="${basedir}/build/jar"/>
+    <property name="artifact.output.distzip" value="${basedir}/build/dist"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+    <property name="temp.jar.path.manual-utils.jar" value="${artifacts.temp.dir}/manual-utils.jar"/>
+    <property name="temp.jar.path.FormatAtlantisHTML.zip" value="${artifacts.temp.dir}/FormatAtlantisHTML.zip"/>
+  </target>
+  
+  <target name="clean.artifact.buildjar" description="clean buildjar artifact output">
+    <delete dir="${artifact.output.buildjar}"/>
+  </target>
+  
+  <target name="clean.artifact.distzip" description="clean distzip artifact output">
+    <delete dir="${artifact.output.distzip}"/>
+  </target>
+  
+  <target name="artifact.buildjar" depends="init.artifacts, compile.module.manual-utils" description="Build &#39;buildjar&#39; artifact">
+    <mkdir dir="${artifact.output.buildjar}"/>
+    <jar destfile="${temp.jar.path.manual-utils.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${manual-utils.output.dir}"/>
+    </jar>
+    <copy file="${temp.jar.path.manual-utils.jar}" tofile="${artifact.output.buildjar}/manual-utils.jar"/>
+    <mkdir dir="${artifact.output.buildjar}/lib"/>
+    <copy todir="${artifact.output.buildjar}/lib">
+      <fileset dir="${basedir}/lib"/>
+    </copy>
+    <copy file="${basedir}/scripts/FormatAtlantisHTML.bat" tofile="${artifact.output.buildjar}/FormatAtlantisHTML.bat"/>
+  </target>
+  
+  <target name="artifact.distzip" depends="init.artifacts, artifact.buildjar" description="Build &#39;distzip&#39; artifact">
+    <mkdir dir="${artifact.output.distzip}"/>
+    <zip destfile="${temp.jar.path.FormatAtlantisHTML.zip}">
+      <zipfileset dir="${artifact.output.buildjar}"/>
+    </zip>
+    <copy file="${temp.jar.path.FormatAtlantisHTML.zip}" tofile="${artifact.output.distzip}/FormatAtlantisHTML.zip"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.buildjar, artifact.distzip" description="Build all artifacts">
+    
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+</project>
