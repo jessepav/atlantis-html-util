@@ -14,15 +14,19 @@ public class FormatAtlantisHTML
 {
     private static int bodyWidth;
     private static float[] fontSizeAdjustment, fontSizeThreshold;
+    private static float indentAdjustment;
+    private static int listSpaces;
 
     private static String usageText;
 
     public static void main(String[] args) throws IOException {
         CmdLineParser parser = new CmdLineParser();
-        Option<Integer> width = parser.addIntegerOption('w', "width");
-        Option<String> size = parser.addStringOption('f', "fontsize");
-        Option<String> threshold = parser.addStringOption('t', "threshold");
-        Option<Boolean> help = parser.addBooleanOption('h', "help");
+        Option<Integer> widthOpt = parser.addIntegerOption('w', "width");
+        Option<Integer> listOpt = parser.addIntegerOption('l', "listspaces");
+        Option<String> sizeOpt = parser.addStringOption('f', "fontsize");
+        Option<String> thresholdOpt = parser.addStringOption('t', "threshold");
+        Option<Double> indentOpt = parser.addDoubleOption('i', "indent");
+        Option<Boolean> helpOpt = parser.addBooleanOption('h', "help");
         try {
             parser.parse(args);
         } catch (CmdLineParser.OptionException e) {
@@ -31,22 +35,27 @@ public class FormatAtlantisHTML
             System.exit(2);
         }
         String[] files = parser.getRemainingArgs();
-        if (parser.getOptionValue(help, Boolean.FALSE) || files.length == 0) {
+        if (parser.getOptionValue(helpOpt, Boolean.FALSE) || files.length == 0 || files.length % 2 != 0) {
             println(getUsageText());
             System.exit(1);
         }
-        bodyWidth = parser.getOptionValue(width, Integer.valueOf(750));
+        bodyWidth = parser.getOptionValue(widthOpt, Integer.valueOf(750));
         fontSizeAdjustment = new float[] {4.0f,3.0f,21.0f};
         fontSizeThreshold = new float[] {10f, 17f, 20f};
-        setFloatArray(fontSizeAdjustment, parser.getOptionValue(size));
-        setFloatArray(fontSizeThreshold, parser.getOptionValue(threshold));
+        setFloatArray(fontSizeAdjustment, parser.getOptionValue(sizeOpt));
+        setFloatArray(fontSizeThreshold, parser.getOptionValue(thresholdOpt));
+        indentAdjustment = parser.getOptionValue(indentOpt, 0.0).floatValue();
+        listSpaces = parser.getOptionValue(listOpt, 0);
         println("Body Width: " + bodyWidth + "px");
         println("Font Size Adjustment: " + Arrays.toString(fontSizeAdjustment));
         println("Font Size Threshold: " + Arrays.toString(fontSizeThreshold));
-        for (String file : files) {
-            println("Processing " + file);
-            processFile(file);
+        println("Indent adjustment: " + indentAdjustment);
+        println("List separator spaces: " + listSpaces);
+        for (int i = 0; i < files.length; i += 2) {
+            println("Processing: " + files[i] + " -> " + files[i+1]);
+            processFile(files[i], files[i+1]);
         }
+
     }
 
     private static void setFloatArray(float[] fa, String s) {
@@ -71,22 +80,29 @@ public class FormatAtlantisHTML
         return usageText;
     }
 
-    private static final Pattern fontSizePattern = Pattern.compile("font-size\\s{0,2}:{0,2}(\\d[\\d\\.]*)pt");
+    private static final Pattern fontSizePattern = Pattern.compile("font-size\\s{0,2}:\\s{0,2}(\\d[\\d\\.]*)pt");
     private static final Pattern TOCDotPattern = Pattern.compile("\\.{15,}\\d+");
     private static final Pattern pageReferencePattern = Pattern.compile("\\s?\\(see p\\.\\d+\\)");
+    private static final Pattern indentPattern =
+        Pattern.compile("(text-indent|margin-left)\\s{0,2}:\\s{0,2}(-?\\d+(?:\\.\\d+)?)(pt|in)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern listSpacesPattern = Pattern.compile("(?:&nbsp;|<p>)\\d+\\.(?=\\p{IsAlphabetic})");
 
-    private static void processFile(String file) throws IOException {
-        Path path = FileSystems.getDefault().getPath(file);
-        if (!Files.exists(path))
+    private static void processFile(String inputFile, String outputFile) throws IOException {
+        Path inputPath = Paths.get(inputFile);
+        Path outputPath = Paths.get(outputFile);
+        if (!Files.exists(inputPath)) {
+            println("   " + inputFile + " doesn't exist.");
             return;
-        List<String> lines = Files.readAllLines(path, Charset.defaultCharset());
+        }
+        List<String> lines = Files.readAllLines(inputPath, Charset.defaultCharset());
         String line;
+        StringBuffer sb = new StringBuffer(1024);
         for (int i = 0; i < lines.size(); lines.set(i++, line)) {
             line = lines.get(i);
 
             // Check if this file has already been processed; if so, skip it
             if (line.contains("content=\"FormatAtlantisHTML\"")) {
-                println("   " + file + " has already been processed; skipping.");
+                println("   " + inputFile + " has already been processed; skipping.");
                 return;
             }
 
@@ -99,7 +115,8 @@ public class FormatAtlantisHTML
 
             // Fix up the font size
             Matcher m = fontSizePattern.matcher(line);
-            if (m.find()) {
+            sb.setLength(0);
+            while (m.find()) {
                 float pt = Float.parseFloat(m.group(1));
                 if (pt <= fontSizeThreshold[0])
                     pt += fontSizeAdjustment[0];
@@ -111,7 +128,43 @@ public class FormatAtlantisHTML
                 int idx = s.indexOf('.');
                 if (idx != -1)
                     s = s.substring(0, idx + 2);
-                line = m.replaceAll("font-size:" + s + "pt");
+                m.appendReplacement(sb, "font-size:" + s + "pt");
+            }
+            m.appendTail(sb);
+            line = sb.toString();
+
+            // Adjust indents
+            if (indentAdjustment != 0.0) {
+                m = indentPattern.matcher(line);
+                sb.setLength(0);
+                while (m.find()) {
+                    String prop = m.group(1);
+                    float val = Float.parseFloat(m.group(2));
+                    String unit = m.group(3);
+                    if (unit.equalsIgnoreCase("in"))
+                        val *= 72.0f;   // convert to points
+                    val += indentAdjustment * Math.signum(val);
+                    String s = Float.toString(val);
+                    int idx = s.indexOf('.');
+                    if (idx != -1)
+                        s = s.substring(0, idx + 2);
+                    m.appendReplacement(sb, prop + ":" + s + "pt");
+                }
+                m.appendTail(sb);
+                line = sb.toString();
+            }
+
+            // Insert spaces in list items
+            if (listSpaces > 0) {
+                m = listSpacesPattern.matcher(line);
+                if (m.find()) {
+                    sb.setLength(0);
+                    sb.append(line.substring(0,m.end()));
+                    for (int j = 0; j < listSpaces; j++)
+                        sb.append("&nbsp;");
+                    sb.append(line.substring(m.end()));
+                    line = sb.toString();
+                }
             }
 
             // Add some custom CSS
@@ -139,7 +192,7 @@ public class FormatAtlantisHTML
             if (m.find())
                 line = m.replaceAll("");
         }
-        Files.write(path, lines, Charset.defaultCharset());
+        Files.write(outputPath, lines, Charset.defaultCharset());
     }
 
     static void println(String msg) {

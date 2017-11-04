@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="trunk" default="all">
+<project name="manual-utils" default="all">
   
   
   <property file="manual-utils-build.properties"/>

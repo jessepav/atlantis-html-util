@@ -1,11 +1,23 @@
-Usage: FormatAtlantisHTML [options] <input html file> [input html file...]
+Usage: FormatAtlantisHTML [options] <input html file> <output file> [<input> <output> ...]
 
 Options:
-  -w,--width     <body width>
-  -t,--fontsize  <font_size_threshold #1,#2,#3>
-  -f,--threshold <font_size_adjustment #1,#2,#3>
+  -w,--width       <body width>
+  -t,--fontsize    <font_size_threshold #1,#2,#3>
+  -f,--threshold   <font_size_adjustment #1,#2,#3>
+  -i,--indent      <indent and margin adjustment (in pt)>
+  -l,--listspaces  <# of spaces>
 
 Font Size and Threshold Options:
  + sizes smaller than threshold #1 will be increased by adjustment #1
  + sizes smaller than threshold #2 will be increased by adjustment #2
  + sizes smaller than threshold #3 will be *set to* adjustment #3
+
+-i,--indent will increase text-indent and margin-left values by the
+  specified number of points, in the direction away from zero,
+  i.e. positive values will be increased and negative values decreased.
+
+-l,--listspace will insert the specified number of non-breaking spaces
+  between a numeric list marker and the rest of the line, if no spaces
+  are present. Ex (--listspaces 1):
+
+  1.A list item  ->  1.&nbsp;A list item
