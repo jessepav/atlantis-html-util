@@ -4,3 +4,4 @@ scripts
 src
 manual-utils.iml
 manual-utils-build.*
+format-atlantis-html.install4j

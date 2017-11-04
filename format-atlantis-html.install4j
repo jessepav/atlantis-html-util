@@ -29,7 +29,29 @@
     <components />
   </files>
   <launchers>
-    <launcher name="FAH" id="20" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="" pngIcon32File="" macServiceDependencies="" swtApp="false" fileset="">
+    <launcher name="FAHc (command line)" id="20" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="" pngIcon32File="" macServiceDependencies="" swtApp="false" fileset="">
+      <executable name="FAHc" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="error.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
+        <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
+      </executable>
+      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
+        <text>
+          <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+        </text>
+      </splashScreen>
+      <java mainClass="com.humidmail.utils.manual.FormatAtlantisHTML" vmParameters="" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+        <classPath>
+          <archive location="files/manual-utils.jar" failOnError="false" />
+        </classPath>
+        <nativeLibraryDirectories />
+      </java>
+      <includedFiles />
+      <unextractableFiles />
+      <customScript mode="1" file="">
+        <scriptLines />
+      </customScript>
+    </launcher>
+    <launcher name="FAH (GUI)" id="70" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="" pngIcon32File="" macServiceDependencies="" swtApp="false" fileset="">
       <executable name="FAH" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="error.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
