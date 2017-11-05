@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
-Class-Path: lib\jargs.jar
+Class-Path: lib\jargs.jar lib\jfd-loader.jar lib\jgoodies-common-1.8.1
+ .jar lib\jgoodies-forms-1.7.2.jar
 Main-Class: com.humidmail.utils.manual.FormatAtlantisHTML
 

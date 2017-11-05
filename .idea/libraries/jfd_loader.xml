@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jfd-loader">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jfd-loader.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

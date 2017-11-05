@@ -6,6 +6,7 @@ Options:
   -f,--threshold   <font_size_adjustment #1,#2,#3>
   -i,--indent      <indent and margin adjustment (in pt)>
   -l,--listspaces  <# of spaces>
+  --gui
 
 Font Size and Threshold Options:
  + sizes smaller than threshold #1 will be increased by adjustment #1
@@ -21,3 +22,6 @@ Font Size and Threshold Options:
   are present. Ex (--listspaces 1):
 
   1.A list item  ->  1.&nbsp;A list item
+
+--gui will start the GUI rather than processing files. If this option
+  is present, <input file(s)> and <output file(s)> are disregarded.

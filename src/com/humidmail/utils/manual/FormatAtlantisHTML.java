@@ -27,6 +27,8 @@ public class FormatAtlantisHTML
         Option<String> thresholdOpt = parser.addStringOption('t', "threshold");
         Option<Double> indentOpt = parser.addDoubleOption('i', "indent");
         Option<Boolean> helpOpt = parser.addBooleanOption('h', "help");
+        Option<Boolean> guiOpt = parser.addBooleanOption("gui");
+
         try {
             parser.parse(args);
         } catch (CmdLineParser.OptionException e) {
@@ -35,9 +37,9 @@ public class FormatAtlantisHTML
             System.exit(2);
         }
         String[] files = parser.getRemainingArgs();
-        if (parser.getOptionValue(helpOpt, Boolean.FALSE) || files.length == 0 || files.length % 2 != 0) {
+        if (parser.getOptionValue(helpOpt, Boolean.FALSE)) {
             println(getUsageText());
-            System.exit(1);
+            System.exit(0);
         }
         bodyWidth = parser.getOptionValue(widthOpt, Integer.valueOf(750));
         fontSizeAdjustment = new float[] {4.0f,3.0f,21.0f};
@@ -46,14 +48,23 @@ public class FormatAtlantisHTML
         setFloatArray(fontSizeThreshold, parser.getOptionValue(thresholdOpt));
         indentAdjustment = parser.getOptionValue(indentOpt, 0.0).floatValue();
         listSpaces = parser.getOptionValue(listOpt, 0);
-        println("Body Width: " + bodyWidth + "px");
-        println("Font Size Adjustment: " + Arrays.toString(fontSizeAdjustment));
-        println("Font Size Threshold: " + Arrays.toString(fontSizeThreshold));
-        println("Indent adjustment: " + indentAdjustment);
-        println("List separator spaces: " + listSpaces);
-        for (int i = 0; i < files.length; i += 2) {
-            println("Processing: " + files[i] + " -> " + files[i+1]);
-            processFile(files[i], files[i+1]);
+
+        if (parser.getOptionValue(guiOpt, Boolean.FALSE)) {
+
+        } else { // command-line mode
+            if (files.length == 0 || files.length % 2 != 0) {
+                println(getUsageText());
+                System.exit(1);
+            }
+            println("Body Width: " + bodyWidth + "px");
+            println("Font Size Adjustment: " + Arrays.toString(fontSizeAdjustment));
+            println("Font Size Threshold: " + Arrays.toString(fontSizeThreshold));
+            println("Indent adjustment: " + indentAdjustment);
+            println("List separator spaces: " + listSpaces);
+            for (int i = 0; i < files.length; i += 2) {
+                println("Processing: " + files[i] + " -> " + files[i+1]);
+                processFile(files[i], files[i+1]);
+            }
         }
 
     }

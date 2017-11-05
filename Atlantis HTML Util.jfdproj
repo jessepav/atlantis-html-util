@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <entry key="sourcefolders1" value="src" />
+  <node name="designer">
+    <node name="formlayout">
+      <entry key="_settingsEnabled" value="true" />
+      <entry key="formsversion" value="10600" />
+      <entry key="intelligapenabled" value="false" />
+    </node>
+  </node>
+</project>
+
