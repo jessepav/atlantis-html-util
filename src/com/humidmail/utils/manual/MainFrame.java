@@ -54,6 +54,8 @@ public class MainFrame implements ActionListener
             JButton[] buttons = {inputBrowseButton, outputBrowseButton, processButton};
             for (JButton b : buttons)
                 b.addActionListener(this);
+                
+            // TODO: attach a focus listener to inputFileField, and on focus-lost, check for a property file to load
             frame.addWindowListener(new FrameListener());
             frame.setVisible(true);
         } catch (Exception ex) {
