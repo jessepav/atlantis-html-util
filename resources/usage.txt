@@ -6,7 +6,10 @@ Options:
   -f,--threshold   <font_size_adjustment #1,#2,#3>
   -i,--indent      <indent and margin adjustment (in pt)>
   -l,--listspaces  <# of spaces>
+  -p,--keep_page_refs
+  -t,--keep_TOC_leaders
   --gui
+
 
 Font Size and Threshold Options:
  + sizes smaller than threshold #1 will be increased by adjustment #1

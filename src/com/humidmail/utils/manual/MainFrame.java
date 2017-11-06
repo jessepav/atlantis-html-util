@@ -20,6 +20,7 @@ public class MainFrame implements ActionListener
     private JButton inputBrowseButton, outputBrowseButton;
     private JSpinner bodyWidthSpinner, indentSpinner, listSpacesSpinner;
     private JSpinner[] thresholdSpinners, sizeSpinners;
+    private JCheckBox removePageRefsCheckBox, removeTOCLeadersCheckBox;
     private JButton processButton;
 
     private JFileChooser chooser;
@@ -44,15 +45,10 @@ public class MainFrame implements ActionListener
                 thresholdSpinners[i] = cr.getSpinner("thresholdSpinner" + (i+1));
                 sizeSpinners[i] = cr.getSpinner("sizeSpinner" + (i+1));
             }
+            removePageRefsCheckBox = cr.getCheckBox("removePageRefsCheckBox");
+            removeTOCLeadersCheckBox = cr.getCheckBox("removeTOCLeadersCheckBox");
 
-            // Pull the current values out of the static fields of FormatAtlantisHTML
-            bodyWidthSpinner.setValue(Integer.valueOf(Float.valueOf(FormatAtlantisHTML.bodyWidth).intValue()));
-            indentSpinner.setValue(Integer.valueOf(Float.valueOf(FormatAtlantisHTML.indentAdjustment).intValue()));
-            listSpacesSpinner.setValue(Integer.valueOf(Float.valueOf(FormatAtlantisHTML.listSpaces).intValue()));
-            for (int i = 0; i < thresholdSpinners.length; i++) {
-                thresholdSpinners[i].setValue(Integer.valueOf(Float.valueOf(FormatAtlantisHTML.fontSizeThreshold[i]).intValue()));
-                sizeSpinners[i].setValue(Integer.valueOf(Float.valueOf(FormatAtlantisHTML.fontSizeAdjustment[i]).intValue()));
-            }
+            initializeComponents();
 
             JButton[] buttons = {inputBrowseButton, outputBrowseButton, processButton};
             for (JButton b : buttons)
@@ -64,6 +60,36 @@ public class MainFrame implements ActionListener
             ex.printStackTrace();
             System.exit(3);
         }
+    }
+
+    /**
+     * Initialize our components based on the values of the static fields of FormatAtlantisHTML
+     */
+    private void initializeComponents() {
+        bodyWidthSpinner.setValue(Integer.valueOf(Float.valueOf(FormatAtlantisHTML.bodyWidth).intValue()));
+        indentSpinner.setValue(Integer.valueOf(Float.valueOf(FormatAtlantisHTML.indentAdjustment).intValue()));
+        listSpacesSpinner.setValue(Integer.valueOf(Float.valueOf(FormatAtlantisHTML.listSpaces).intValue()));
+        for (int i = 0; i < thresholdSpinners.length; i++) {
+            thresholdSpinners[i].setValue(Integer.valueOf(Float.valueOf(FormatAtlantisHTML.fontSizeThreshold[i]).intValue()));
+            sizeSpinners[i].setValue(Integer.valueOf(Float.valueOf(FormatAtlantisHTML.fontSizeAdjustment[i]).intValue()));
+        }
+        removePageRefsCheckBox.setSelected(FormatAtlantisHTML.removePageRefs);
+        removeTOCLeadersCheckBox.setSelected(FormatAtlantisHTML.removeTOCLeaders);
+    }
+
+    /**
+     * Saves the values of our components into the static fields of FormatAtlantisHTML
+     */
+    private void saveComponentValues() {
+        FormatAtlantisHTML.bodyWidth = ((Integer) bodyWidthSpinner.getValue()).intValue();
+        FormatAtlantisHTML.indentAdjustment = ((Integer) indentSpinner.getValue()).floatValue();
+        FormatAtlantisHTML.listSpaces = ((Integer) listSpacesSpinner.getValue()).intValue();
+        for (int i = 0; i < thresholdSpinners.length; i++) {
+            FormatAtlantisHTML.fontSizeThreshold[i] = ((Integer) thresholdSpinners[i].getValue()).floatValue();
+            FormatAtlantisHTML.fontSizeAdjustment[i] = ((Integer) sizeSpinners[i].getValue()).floatValue();
+        }
+        FormatAtlantisHTML.removePageRefs = removePageRefsCheckBox.isSelected();
+        FormatAtlantisHTML.removeTOCLeaders = removeTOCLeadersCheckBox.isSelected();
     }
 
     private void close() {
@@ -97,13 +123,7 @@ public class MainFrame implements ActionListener
             String inputFile = inputFileField.getText();
             String outputFile = outputFileField.getText();
             if (!inputFile.isEmpty() && !outputFile.isEmpty()) {
-                FormatAtlantisHTML.bodyWidth = ((Integer) bodyWidthSpinner.getValue()).intValue();
-                FormatAtlantisHTML.indentAdjustment = ((Integer) indentSpinner.getValue()).floatValue();
-                FormatAtlantisHTML.listSpaces = ((Integer) listSpacesSpinner.getValue()).intValue();
-                for (int i = 0; i < thresholdSpinners.length; i++) {
-                    FormatAtlantisHTML.fontSizeThreshold[i] = ((Integer) thresholdSpinners[i].getValue()).floatValue();
-                    FormatAtlantisHTML.fontSizeAdjustment[i] = ((Integer) sizeSpinners[i].getValue()).floatValue();
-                }
+                saveComponentValues();
                 try {
                     String msg = FormatAtlantisHTML.processFile(inputFile, outputFile);
                     JOptionPane.showMessageDialog(frame, msg);
@@ -128,6 +148,9 @@ public class MainFrame implements ActionListener
             props.setProperty(key1, thresholdSpinners[i].getValue().toString());
             props.setProperty(key2, sizeSpinners[i].getValue().toString());
         }
+        props.setProperty("remove_page_refs", Boolean.toString(removePageRefsCheckBox.isSelected()));
+        props.setProperty("remove_TOC_leaders", Boolean.toString(removeTOCLeadersCheckBox.isSelected()));
+        props.setProperty("output_file", outputFileField.getText());
         int idx = inputFile.lastIndexOf('.');
         if (idx == -1)
             idx = inputFile.length();
@@ -161,6 +184,10 @@ public class MainFrame implements ActionListener
                         if (props.containsKey(key2))
                             sizeSpinners[i].setValue(Integer.valueOf(props.getProperty(key2)));
                     }
+                    removePageRefsCheckBox.setSelected(Boolean.parseBoolean(props.getProperty("remove_page_refs")));
+                    removeTOCLeadersCheckBox.setSelected(Boolean.parseBoolean(props.getProperty("remove_TOC_leaders")));
+                    if (props.containsKey("output_file"))
+                        outputFileField.setText(props.getProperty("output_file"));
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

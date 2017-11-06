@@ -18,6 +18,7 @@ public class FormatAtlantisHTML
     static float[] fontSizeAdjustment, fontSizeThreshold;
     static float indentAdjustment;
     static int listSpaces;
+    static boolean removeTOCLeaders, removePageRefs;
 
     private static String usageText;
 
@@ -28,6 +29,8 @@ public class FormatAtlantisHTML
         Option<String> sizeOpt = parser.addStringOption('f', "fontsize");
         Option<String> thresholdOpt = parser.addStringOption('t', "threshold");
         Option<Double> indentOpt = parser.addDoubleOption('i', "indent");
+        Option<Boolean> pageRefsOpt = parser.addBooleanOption('p', "keep_page_refs");
+        Option<Boolean> tocOpt = parser.addBooleanOption('t', "keep_TOC_leaders");
         Option<Boolean> helpOpt = parser.addBooleanOption('h', "help");
         Option<Boolean> guiOpt = parser.addBooleanOption("gui");
 
@@ -50,6 +53,8 @@ public class FormatAtlantisHTML
         setFloatArray(fontSizeThreshold, parser.getOptionValue(thresholdOpt));
         indentAdjustment = parser.getOptionValue(indentOpt, 0.0).floatValue();
         listSpaces = parser.getOptionValue(listOpt, 0);
+        removeTOCLeaders = !parser.getOptionValue(tocOpt, Boolean.FALSE).booleanValue();
+        removePageRefs = !parser.getOptionValue(pageRefsOpt, Boolean.FALSE).booleanValue();
 
         if (parser.getOptionValue(guiOpt, Boolean.FALSE)) {
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -70,6 +75,8 @@ public class FormatAtlantisHTML
             println("Font Size Threshold: " + Arrays.toString(fontSizeThreshold));
             println("Indent adjustment: " + indentAdjustment);
             println("List separator spaces: " + listSpaces);
+            println("Remove TOC Leaders: " + removeTOCLeaders);
+            println("Remove Page Refs: " + removePageRefs);
             for (int i = 0; i < files.length; i += 2) {
                 println("Processing: " + files[i] + " -> " + files[i+1]);
                 println(processFile(files[i], files[i+1]));
@@ -198,16 +205,20 @@ public class FormatAtlantisHTML
             }
 
             // Remove TOC formatting
-            m = TOCDotPattern.matcher(line);
-            if (m.find()) {
-                line = m.replaceFirst("");
-                continue;
+            if (removeTOCLeaders) {
+                m = TOCDotPattern.matcher(line);
+                if (m.find()) {
+                    line = m.replaceFirst("");
+                    continue;
+                }
             }
 
             // Remove page # references
-            m = pageReferencePattern.matcher(line);
-            if (m.find())
-                line = m.replaceAll("");
+            if (removePageRefs) {
+                m = pageReferencePattern.matcher(line);
+                if (m.find())
+                    line = m.replaceAll("");
+            }
         }
         Files.write(outputPath, lines, Charset.defaultCharset());
         return outputPath.getFileName().toString() + " written successfully.";

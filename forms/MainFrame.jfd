@@ -63,7 +63,7 @@ new FormModel {
 			} )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 				"$columnSpecs": "right:default, labelcompgap, left:default, 12dlu, right:default, relgap, 25dlu"
-				"$rowSpecs": "default, relgap, default, unrelgap, default, relgap, default, relgap, default"
+				"$rowSpecs": "default, relgap, default, unrelgap, default, relgap, default, relgap, default, unrelgap, default"
 			} ) {
 				name: "panel1"
 				add( new FormComponent( "javax.swing.JLabel" ) {
@@ -186,6 +186,21 @@ new FormModel {
 					"gridX": 7
 					"gridY": 9
 				} )
+				add( new FormComponent( "javax.swing.JCheckBox" ) {
+					name: "removePageRefsCheckBox"
+					"text": "Remove Page # Refs"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridY": 11
+					"gridWidth": 3
+				} )
+				add( new FormComponent( "javax.swing.JCheckBox" ) {
+					name: "removeTOCLeadersCheckBox"
+					"text": "Remove TOC Leaders"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridY": 11
+					"gridWidth": 3
+					"gridX": 5
+				} )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 2
 				"gridY": 6
@@ -207,7 +222,7 @@ new FormModel {
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 405, 310 )
+			"size": new java.awt.Dimension( 405, 335 )
 		} )
 	}
 }
