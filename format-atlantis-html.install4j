@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="4.2.8" transformSequenceNumber="2">
-  <directoryPresets config="./build/install4j" />
+  <directoryPresets config="./Extras" />
   <application name="Format Atlantis HTML" distributionSourceDir="" applicationId="3275-1080-9590-0433" mediaDir="./build/install4j" mediaFilePattern="FormatAtlantisHTML-${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" keepModificationTimes="false" missingFilesStrategy="error" shortName="format-atlantis-html" publisher="Illcode" publisherWeb="http://www.illcode.com/" version="1.2" allPathsRelative="true" backupOnSave="false" autoSave="false" convertDotsToUnderscores="false" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="1.8" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
@@ -51,17 +51,17 @@
         <scriptLines />
       </customScript>
     </launcher>
-    <launcher name="FAH (GUI)" id="70" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="" pngIcon32File="" macServiceDependencies="" swtApp="false" fileset="">
-      <executable name="FAH" type="1" iconSet="false" iconFile="" executableDir="" redirectStderr="false" stderrFile="error.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="2" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
+    <launcher name="FAH (GUI)" id="70" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="./Extras/icon32.png" pngIcon32File="./Extras/icon16.png" macServiceDependencies="" swtApp="false" fileset="">
+      <executable name="FormatAtlantisHTML" type="1" iconSet="true" iconFile="" executableDir="" redirectStderr="true" stderrFile="error.log" stderrMode="overwrite" redirectStdout="false" stdoutFile="output.log" stdoutMode="overwrite" failOnStderrOutput="true" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="false" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="" executionLevel="asInvoker" checkConsoleParameter="false" globalSingleInstance="false">
         <versionInfo include="false" fileVersion="" fileDescription="" legalCopyright="" internalName="" productName="" />
       </executable>
-      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="" java6SplashScreen="false">
+      <splashScreen show="true" autoOff="true" alwaysOnTop="true" width="100" height="101" bitmapFile="./Extras/FAH-splash.png" java6SplashScreen="false">
         <text>
           <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
-          <versionLine x="20" y="40" text="version ${compiler:sys.version}" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <versionLine x="79" y="80" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="com.humidmail.utils.manual.FormatAtlantisHTML" vmParameters="" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="com.humidmail.utils.manual.FormatAtlantisHTML" vmParameters="" arguments="--gui" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <archive location="files/manual-utils.jar" failOnError="false" />
         </classPath>
@@ -343,7 +343,7 @@
       <variables />
     </win32Archive>
   </mediaSets>
-  <buildIds buildAll="true">
+  <buildIds buildAll="false">
     <mediaSet refId="23" />
   </buildIds>
 </install4j>
