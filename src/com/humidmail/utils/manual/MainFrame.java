@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.List;
 import java.nio.file.*;
 
-public class MainFrame implements ActionListener, DocumentListener, FocusListener
+public class MainFrame implements ActionListener
 {
     private JFrame frame;
     private JTextField inputFileField, outputFileField;
@@ -23,20 +23,6 @@ public class MainFrame implements ActionListener, DocumentListener, FocusListene
     private JButton processButton;
 
     private JFileChooser chooser;
-
-    private Document inputFieldDocument;
-    private boolean inputFieldModified;
-
-    /* There's a gnarly interaction that occurs when the inputFileField is modified (thus setting
-       inputFieldModified to true) and then the processButton is clicked: the showConfirmDialog()
-       call in checkPropsFile() pumps the AWT event queue and runs the actionPerformed() for
-       processButton *before* the user clicks on anything in the confirm dialog. Therefore, we
-       keep track of our call stack, as it were, and make sure that in this case the confirm dialog
-       is clicked away before the processButton logic runs. */
-    private boolean inFocusHandler, processRequested;
-
-    // Don't prompt to load the same properties file twice in a row.
-    private String lastPropFileName;
 
     MainFrame() {
         try {
@@ -72,12 +58,6 @@ public class MainFrame implements ActionListener, DocumentListener, FocusListene
             for (JButton b : buttons)
                 b.addActionListener(this);
 
-            lastPropFileName = "";
-            inFocusHandler = processRequested = false;
-
-            inputFileField.addFocusListener(this);
-            inputFieldDocument = inputFileField.getDocument();
-            inputFieldDocument.addDocumentListener(this);
             frame.addWindowListener(new FrameListener());
             frame.setVisible(true);
         } catch (Exception ex) {
@@ -104,7 +84,6 @@ public class MainFrame implements ActionListener, DocumentListener, FocusListene
                 if (idx != -1)
                     name = name.substring(0, idx);
                 outputFileField.setText(p.resolveSibling(name + "-out.html").toString());
-                inputFieldModified = false;  // inhibit the focus handler
                 checkPropsFile(inputFileField.getText());
             }
         } else if (source == outputBrowseButton) {
@@ -115,10 +94,6 @@ public class MainFrame implements ActionListener, DocumentListener, FocusListene
                 outputFileField.setText(p.toString());
             }
         } else if (source == processButton) {
-            if (inFocusHandler) {
-                processRequested = true;
-                return;
-            }
             String inputFile = inputFileField.getText();
             String outputFile = outputFileField.getText();
             if (!inputFile.isEmpty() && !outputFile.isEmpty()) {
@@ -130,27 +105,10 @@ public class MainFrame implements ActionListener, DocumentListener, FocusListene
                     FormatAtlantisHTML.fontSizeAdjustment[i] = ((Integer) sizeSpinners[i].getValue()).floatValue();
                 }
                 try {
-                    JOptionPane.showMessageDialog(frame, FormatAtlantisHTML.processFile(inputFile, outputFile));
-
-                    // And now save our values to a properties file
-                    Properties props = new Properties();
-                    props.setProperty("body_width", bodyWidthSpinner.getValue().toString());
-                    props.setProperty("indent", indentSpinner.getValue().toString());
-                    props.setProperty("list_spaces", listSpacesSpinner.getValue().toString());
-                    for (int i = 0; i < thresholdSpinners.length; i++) {
-                        String key1 = "font_threshold" + (i+1);
-                        String key2 = "font_size" + (i+1);
-                        props.setProperty(key1, thresholdSpinners[i].getValue().toString());
-                        props.setProperty(key2, sizeSpinners[i].getValue().toString());
-                    }
-                    String propsFile = inputFile;
-                    int idx = propsFile.lastIndexOf('.');
-                    if (idx != -1)
-                        propsFile = propsFile.substring(0, idx);
-                    propsFile += "-format.prefs";
-                    try (FileWriter w = new FileWriter(propsFile)) {
-                        props.store(w, "Atlantis HTML Util properties");
-                    }
+                    String msg = FormatAtlantisHTML.processFile(inputFile, outputFile);
+                    JOptionPane.showMessageDialog(frame, msg);
+                    if (msg.contains("written successfully"))
+                        writePropsFile(inputFile);
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(frame, "Error processing file:\n\n" + ex.getMessage(),
                         "Error", JOptionPane.ERROR_MESSAGE);
@@ -159,47 +117,32 @@ public class MainFrame implements ActionListener, DocumentListener, FocusListene
         }
     }
 
-    public void focusGained(FocusEvent e) { /* nothing */ }
-
-    public void focusLost(FocusEvent e) {
-        if (e.isTemporary())
-            return;
-        Component c = e.getComponent();
-        if (c == inputFileField && inputFieldModified) {
-            inFocusHandler = true;
-            checkPropsFile(inputFileField.getText());
-            inFocusHandler = false;
-            if (processRequested) {
-                processButton.doClick();
-                processRequested = false;
-            }
+    private void writePropsFile(String inputFile) throws IOException {
+        Properties props = new Properties();
+        props.setProperty("body_width", bodyWidthSpinner.getValue().toString());
+        props.setProperty("indent", indentSpinner.getValue().toString());
+        props.setProperty("list_spaces", listSpacesSpinner.getValue().toString());
+        for (int i = 0; i < thresholdSpinners.length; i++) {
+            String key1 = "font_threshold" + (i+1);
+            String key2 = "font_size" + (i+1);
+            props.setProperty(key1, thresholdSpinners[i].getValue().toString());
+            props.setProperty(key2, sizeSpinners[i].getValue().toString());
+        }
+        int idx = inputFile.lastIndexOf('.');
+        if (idx == -1)
+            idx = inputFile.length();
+        String propsFile = inputFile.substring(0, idx) + "-format.prefs";
+        try (FileWriter w = new FileWriter(propsFile)) {
+            props.store(w, "Atlantis HTML Util properties");
         }
     }
 
-    public void insertUpdate(DocumentEvent e) {
-        if (e.getDocument() == inputFieldDocument)
-            inputFieldModified = true;
-    }
-
-    public void removeUpdate(DocumentEvent e) {
-        if (e.getDocument() == inputFieldDocument)
-            inputFieldModified = true;
-    }
-
-    public void changedUpdate(DocumentEvent e) {
-        // plain text components do not fire this event
-    }
-
     private void checkPropsFile(String docPath) {
-        if (lastPropFileName.equals(docPath))
-            return;
-
         int idx = docPath.lastIndexOf('.');
         if (idx == -1)
             idx = docPath.length();
         Path propsPath = Paths.get(docPath.substring(0, idx) + "-format.prefs");
         if (Files.exists(propsPath)) {
-            lastPropFileName = docPath;
             if (JOptionPane.showConfirmDialog(frame,
                     "A saved settings file was found for this HTML document.\n\nLoad it?", "Load Settings",
                     JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
