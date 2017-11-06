@@ -10,12 +10,14 @@ import java.nio.charset.Charset;
 import com.sanityinc.jargs.CmdLineParser;
 import com.sanityinc.jargs.CmdLineParser.Option;
 
+import javax.swing.*;
+
 public class FormatAtlantisHTML
 {
-    private static int bodyWidth;
-    private static float[] fontSizeAdjustment, fontSizeThreshold;
-    private static float indentAdjustment;
-    private static int listSpaces;
+    static int bodyWidth;
+    static float[] fontSizeAdjustment, fontSizeThreshold;
+    static float indentAdjustment;
+    static int listSpaces;
 
     private static String usageText;
 
@@ -42,15 +44,22 @@ public class FormatAtlantisHTML
             System.exit(0);
         }
         bodyWidth = parser.getOptionValue(widthOpt, Integer.valueOf(750));
-        fontSizeAdjustment = new float[] {4.0f,3.0f,21.0f};
         fontSizeThreshold = new float[] {10f, 17f, 20f};
+        fontSizeAdjustment = new float[] {4.0f,3.0f,21.0f};
         setFloatArray(fontSizeAdjustment, parser.getOptionValue(sizeOpt));
         setFloatArray(fontSizeThreshold, parser.getOptionValue(thresholdOpt));
         indentAdjustment = parser.getOptionValue(indentOpt, 0.0).floatValue();
         listSpaces = parser.getOptionValue(listOpt, 0);
 
         if (parser.getOptionValue(guiOpt, Boolean.FALSE)) {
-
+            javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    try {
+                        javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+                    } catch (Exception ex) { /* It's okay if setting the L&F failed.*/ }
+                    new MainFrame();
+                }
+            });
         } else { // command-line mode
             if (files.length == 0 || files.length % 2 != 0) {
                 println(getUsageText());
@@ -63,10 +72,9 @@ public class FormatAtlantisHTML
             println("List separator spaces: " + listSpaces);
             for (int i = 0; i < files.length; i += 2) {
                 println("Processing: " + files[i] + " -> " + files[i+1]);
-                processFile(files[i], files[i+1]);
+                println(processFile(files[i], files[i+1]));
             }
         }
-
     }
 
     private static void setFloatArray(float[] fa, String s) {
@@ -82,7 +90,7 @@ public class FormatAtlantisHTML
         }
     }
 
-    private static String getUsageText() throws UnsupportedEncodingException {
+    static String getUsageText() throws UnsupportedEncodingException {
         if (usageText == null) {
             InputStream in = FormatAtlantisHTML.class.getResourceAsStream("/resources/usage.txt");
             Reader reader = new InputStreamReader(in, "UTF-8");
@@ -98,12 +106,11 @@ public class FormatAtlantisHTML
         Pattern.compile("(text-indent|margin-left)\\s{0,2}:\\s{0,2}(-?\\d+(?:\\.\\d+)?)(pt|in)", Pattern.CASE_INSENSITIVE);
     private static final Pattern listSpacesPattern = Pattern.compile("(?:&nbsp;|<p>)\\d+\\.(?=\\p{IsAlphabetic})");
 
-    private static void processFile(String inputFile, String outputFile) throws IOException {
+    static String processFile(String inputFile, String outputFile) throws IOException {
         Path inputPath = Paths.get(inputFile);
         Path outputPath = Paths.get(outputFile);
         if (!Files.exists(inputPath)) {
-            println("   " + inputFile + " doesn't exist.");
-            return;
+            return "   " + inputFile + " doesn't exist.";
         }
         List<String> lines = Files.readAllLines(inputPath, Charset.defaultCharset());
         String line;
@@ -113,8 +120,7 @@ public class FormatAtlantisHTML
 
             // Check if this file has already been processed; if so, skip it
             if (line.contains("content=\"FormatAtlantisHTML\"")) {
-                println("   " + inputFile + " has already been processed; skipping.");
-                return;
+                return "   " + inputFile + " has already been processed; skipping.";
             }
 
             // Add a meta tag indicating the file has been processed
@@ -204,13 +210,14 @@ public class FormatAtlantisHTML
                 line = m.replaceAll("");
         }
         Files.write(outputPath, lines, Charset.defaultCharset());
+        return outputPath.getFileName().toString() + " written successfully.";
     }
 
     static void println(String msg) {
         System.out.println(msg);
     }
 
-    public static String slurpReaderText(Reader r, int bufferSize) {
+    static String slurpReaderText(Reader r, int bufferSize) {
         String s = "";
         try (BufferedReader br = new BufferedReader(r)) {
             char [] buffer = new char[bufferSize];

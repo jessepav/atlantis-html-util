@@ -4,14 +4,210 @@ new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-			"$columnSpecs": "default, labelcompgap, default"
-			"$rowSpecs": "default, linegap, default, linegap, default"
+			"$columnSpecs": "unrelgap, default, labelcompgap, center:default, relgap, left:default:grow, unrelgap"
+			"$rowSpecs": "unrelgap, default, linegap, default, 15dlu, default, 15dlu, default, unrelgap"
 		} ) {
 			name: "this"
 			"title": "Atlantis HTML Util"
+			"resizable": false
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "label1"
+				"text": "Input HTML File"
+				"horizontalAlignment": 4
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 2
+				"gridY": 2
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "inputFileField"
+				"columns": 28
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 4
+				"gridY": 2
+			} )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "inputBrowseButton"
+				"text": "Browse"
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 6
+				"gridY": 2
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "label2"
+				"text": "Output File"
+				"horizontalAlignment": 4
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 2
+				"gridY": 4
+			} )
+			add( new FormComponent( "javax.swing.JTextField" ) {
+				name: "outputFileField"
+				"columns": 28
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 4
+				"gridY": 4
+			} )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "outputBrowseButton"
+				"text": "Browse"
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 6
+				"gridY": 4
+			} )
+			add( new FormComponent( "javax.swing.JSeparator" ) {
+				name: "separator1"
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 2
+				"gridY": 5
+				"gridWidth": 5
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+				"$columnSpecs": "right:default, labelcompgap, left:default, 12dlu, right:default, relgap, 25dlu"
+				"$rowSpecs": "default, relgap, default, unrelgap, default, relgap, default, relgap, default"
+			} ) {
+				name: "panel1"
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label3"
+					"text": "Body Width (px)"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) )
+				add( new FormComponent( "javax.swing.JSpinner" ) {
+					name: "bodyWidthSpinner"
+					"model": new javax.swing.SpinnerNumberModel( 750, 450, 1280, 10 )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label4"
+					"text": "Indent Adjustment (pt)"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 5
+					"gridY": 1
+				} )
+				add( new FormComponent( "javax.swing.JSpinner" ) {
+					name: "indentSpinner"
+					"model": new javax.swing.SpinnerNumberModel( 0, 0, 50, 1 )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 7
+					"gridY": 1
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label5"
+					"text": "Numeric List Item Spaces"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 5
+					"gridY": 3
+				} )
+				add( new FormComponent( "javax.swing.JSpinner" ) {
+					name: "listSpacesSpinner"
+					"model": new javax.swing.SpinnerNumberModel( 0, 0, 15, 1 )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 7
+					"gridY": 3
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label6"
+					"text": "Font Size Threshold #1"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 1
+					"gridY": 5
+				} )
+				add( new FormComponent( "javax.swing.JSpinner" ) {
+					name: "thresholdSpinner1"
+					"model": new javax.swing.SpinnerNumberModel( 10, 3, 40, 1 )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
+					"gridY": 5
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label9"
+					"text": "Font Size Increase #1"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 5
+					"gridY": 5
+				} )
+				add( new FormComponent( "javax.swing.JSpinner" ) {
+					name: "sizeSpinner1"
+					"model": new javax.swing.SpinnerNumberModel( 4, 0, 24, 1 )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 7
+					"gridY": 5
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label7"
+					"text": "Font Size Threshold #2"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridY": 7
+				} )
+				add( new FormComponent( "javax.swing.JSpinner" ) {
+					name: "thresholdSpinner2"
+					"model": new javax.swing.SpinnerNumberModel( 17, 3, 40, 1 )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
+					"gridY": 7
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label10"
+					"text": "Font Size Increase #2"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 5
+					"gridY": 7
+				} )
+				add( new FormComponent( "javax.swing.JSpinner" ) {
+					name: "sizeSpinner2"
+					"model": new javax.swing.SpinnerNumberModel( 3, 0, 24, 1 )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 7
+					"gridY": 7
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label8"
+					"text": "Font Size Threshold #3"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridY": 9
+				} )
+				add( new FormComponent( "javax.swing.JSpinner" ) {
+					name: "thresholdSpinner3"
+					"model": new javax.swing.SpinnerNumberModel( 20, 3, 40, 1 )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 3
+					"gridY": 9
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "label11"
+					"text": "Font Size *Value* #3"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 5
+					"gridY": 9
+				} )
+				add( new FormComponent( "javax.swing.JSpinner" ) {
+					name: "sizeSpinner3"
+					"model": new javax.swing.SpinnerNumberModel( 21, 4, 40, 1 )
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridX": 7
+					"gridY": 9
+				} )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 2
+				"gridY": 6
+				"gridWidth": 5
+			} )
+			add( new FormComponent( "javax.swing.JSeparator" ) {
+				name: "separator2"
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 2
+				"gridY": 7
+				"gridWidth": 5
+			} )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "processButton"
+				"text": "Process"
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 4
+				"gridY": 8
+			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 400, 300 )
+			"size": new java.awt.Dimension( 405, 310 )
 		} )
 	}
 }
