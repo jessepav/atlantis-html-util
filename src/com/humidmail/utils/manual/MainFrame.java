@@ -4,13 +4,16 @@ import com.jformdesigner.model.*;
 import com.jformdesigner.runtime.*;
 
 import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.text.Document;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.nio.file.*;
 
-public class MainFrame implements ActionListener
+public class MainFrame implements ActionListener, DocumentListener, FocusListener
 {
     private JFrame frame;
     private JTextField inputFileField, outputFileField;
@@ -20,6 +23,20 @@ public class MainFrame implements ActionListener
     private JButton processButton;
 
     private JFileChooser chooser;
+
+    private Document inputFieldDocument;
+    private boolean inputFieldModified;
+
+    /* There's a gnarly interaction that occurs when the inputFileField is modified (thus setting
+       inputFieldModified to true) and then the processButton is clicked: the showConfirmDialog()
+       call in checkPropsFile() pumps the AWT event queue and runs the actionPerformed() for
+       processButton *before* the user clicks on anything in the confirm dialog. Therefore, we
+       keep track of our call stack, as it were, and make sure that in this case the confirm dialog
+       is clicked away before the processButton logic runs. */
+    private boolean inFocusHandler, processRequested;
+
+    // Don't prompt to load the same properties file twice in a row.
+    private String lastPropFileName;
 
     MainFrame() {
         try {
@@ -54,8 +71,13 @@ public class MainFrame implements ActionListener
             JButton[] buttons = {inputBrowseButton, outputBrowseButton, processButton};
             for (JButton b : buttons)
                 b.addActionListener(this);
-                
-            // TODO: attach a focus listener to inputFileField, and on focus-lost, check for a property file to load
+
+            lastPropFileName = "";
+            inFocusHandler = processRequested = false;
+
+            inputFileField.addFocusListener(this);
+            inputFieldDocument = inputFileField.getDocument();
+            inputFieldDocument.addDocumentListener(this);
             frame.addWindowListener(new FrameListener());
             frame.setVisible(true);
         } catch (Exception ex) {
@@ -82,27 +104,8 @@ public class MainFrame implements ActionListener
                 if (idx != -1)
                     name = name.substring(0, idx);
                 outputFileField.setText(p.resolveSibling(name + "-out.html").toString());
-
-                Path propsPath = p.resolveSibling(name + "-format.prefs");
-                if (Files.exists(propsPath)) {
-                    try (FileReader r = new FileReader(propsPath.toFile())) {
-                        Properties props = new Properties();
-                        props.load(r);
-                        bodyWidthSpinner.setValue(Integer.valueOf(props.getProperty("body_width", "750")));
-                        indentSpinner.setValue(Integer.valueOf(props.getProperty("indent", "0")));
-                        listSpacesSpinner.setValue(Integer.valueOf(props.getProperty("list_spaces", "0")));
-                        for (int i = 0; i < thresholdSpinners.length; i++) {
-                            String key1 = "font_threshold" + (i+1);
-                            String key2 = "font_size" + (i+1);
-                            if (props.containsKey(key1))
-                                thresholdSpinners[i].setValue(Integer.valueOf(props.getProperty(key1)));
-                            if (props.containsKey(key2))
-                                sizeSpinners[i].setValue(Integer.valueOf(props.getProperty(key2)));
-                        }
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
+                inputFieldModified = false;  // inhibit the focus handler
+                checkPropsFile(inputFileField.getText());
             }
         } else if (source == outputBrowseButton) {
             if (chooser == null)
@@ -112,6 +115,10 @@ public class MainFrame implements ActionListener
                 outputFileField.setText(p.toString());
             }
         } else if (source == processButton) {
+            if (inFocusHandler) {
+                processRequested = true;
+                return;
+            }
             String inputFile = inputFileField.getText();
             String outputFile = outputFileField.getText();
             if (!inputFile.isEmpty() && !outputFile.isEmpty()) {
@@ -147,6 +154,72 @@ public class MainFrame implements ActionListener
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(frame, "Error processing file:\n\n" + ex.getMessage(),
                         "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+
+    public void focusGained(FocusEvent e) { /* nothing */ }
+
+    public void focusLost(FocusEvent e) {
+        if (e.isTemporary())
+            return;
+        Component c = e.getComponent();
+        if (c == inputFileField && inputFieldModified) {
+            inFocusHandler = true;
+            checkPropsFile(inputFileField.getText());
+            inFocusHandler = false;
+            if (processRequested) {
+                processButton.doClick();
+                processRequested = false;
+            }
+        }
+    }
+
+    public void insertUpdate(DocumentEvent e) {
+        if (e.getDocument() == inputFieldDocument)
+            inputFieldModified = true;
+    }
+
+    public void removeUpdate(DocumentEvent e) {
+        if (e.getDocument() == inputFieldDocument)
+            inputFieldModified = true;
+    }
+
+    public void changedUpdate(DocumentEvent e) {
+        // plain text components do not fire this event
+    }
+
+    private void checkPropsFile(String docPath) {
+        if (lastPropFileName.equals(docPath))
+            return;
+
+        int idx = docPath.lastIndexOf('.');
+        if (idx == -1)
+            idx = docPath.length();
+        Path propsPath = Paths.get(docPath.substring(0, idx) + "-format.prefs");
+        if (Files.exists(propsPath)) {
+            lastPropFileName = docPath;
+            if (JOptionPane.showConfirmDialog(frame,
+                    "A saved settings file was found for this HTML document.\n\nLoad it?", "Load Settings",
+                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+            {
+                try (FileReader r = new FileReader(propsPath.toFile())) {
+                    Properties props = new Properties();
+                    props.load(r);
+                    bodyWidthSpinner.setValue(Integer.valueOf(props.getProperty("body_width", "750")));
+                    indentSpinner.setValue(Integer.valueOf(props.getProperty("indent", "0")));
+                    listSpacesSpinner.setValue(Integer.valueOf(props.getProperty("list_spaces", "0")));
+                    for (int i = 0; i < thresholdSpinners.length; i++) {
+                        String key1 = "font_threshold" + (i+1);
+                        String key2 = "font_size" + (i+1);
+                        if (props.containsKey(key1))
+                            thresholdSpinners[i].setValue(Integer.valueOf(props.getProperty(key1)));
+                        if (props.containsKey(key2))
+                            sizeSpinners[i].setValue(Integer.valueOf(props.getProperty(key2)));
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
                 }
             }
         }
