@@ -22,7 +22,7 @@ public class MainFrame implements ActionListener
     private JButton inputBrowseButton, outputBrowseButton;
     private JSpinner bodyWidthSpinner, indentSpinner, listSpacesSpinner;
     private JSpinner[] thresholdSpinners, sizeSpinners;
-    private JCheckBox removePageRefsCheckBox, removeTOCLeadersCheckBox;
+    private JCheckBox removePageRefsCheckBox, removeTOCLeadersCheckBox, v2TOCFixCheckBox;
     private JButton processButton, helpButton;
 
     private JFileChooser chooser;
@@ -52,6 +52,7 @@ public class MainFrame implements ActionListener
             }
             removePageRefsCheckBox = cr.getCheckBox("removePageRefsCheckBox");
             removeTOCLeadersCheckBox = cr.getCheckBox("removeTOCLeadersCheckBox");
+            v2TOCFixCheckBox = cr.getCheckBox("v2TOCFixCheckBox");
 
             initializeComponents();
 
@@ -80,6 +81,7 @@ public class MainFrame implements ActionListener
         }
         removePageRefsCheckBox.setSelected(FormatAtlantisHTML.removePageRefs);
         removeTOCLeadersCheckBox.setSelected(FormatAtlantisHTML.removeTOCLeaders);
+        v2TOCFixCheckBox.setSelected(FormatAtlantisHTML.useV2TocPattern);
     }
 
     /**
@@ -95,6 +97,7 @@ public class MainFrame implements ActionListener
         }
         FormatAtlantisHTML.removePageRefs = removePageRefsCheckBox.isSelected();
         FormatAtlantisHTML.removeTOCLeaders = removeTOCLeadersCheckBox.isSelected();
+        FormatAtlantisHTML.useV2TocPattern = v2TOCFixCheckBox.isSelected();
     }
 
     private void close() {
@@ -168,6 +171,7 @@ public class MainFrame implements ActionListener
         }
         props.setProperty("remove_page_refs", Boolean.toString(removePageRefsCheckBox.isSelected()));
         props.setProperty("remove_TOC_leaders", Boolean.toString(removeTOCLeadersCheckBox.isSelected()));
+        props.setProperty("v2_TOC_fix", Boolean.toString(v2TOCFixCheckBox.isSelected()));
         props.setProperty("output_file", outputFileField.getText());
         int idx = inputFile.lastIndexOf('.');
         if (idx == -1)
@@ -204,6 +208,7 @@ public class MainFrame implements ActionListener
                     }
                     removePageRefsCheckBox.setSelected(Boolean.parseBoolean(props.getProperty("remove_page_refs")));
                     removeTOCLeadersCheckBox.setSelected(Boolean.parseBoolean(props.getProperty("remove_TOC_leaders")));
+                    v2TOCFixCheckBox.setSelected(Boolean.parseBoolean(props.getProperty("v2_TOC_fix")));
                     if (props.containsKey("output_file"))
                         outputFileField.setText(props.getProperty("output_file"));
                 } catch (IOException ex) {

@@ -18,7 +18,7 @@ public class FormatAtlantisHTML
     static float[] fontSizeAdjustment, fontSizeThreshold;
     static float indentAdjustment;
     static int listSpaces;
-    static boolean removeTOCLeaders, removePageRefs;
+    static boolean removeTOCLeaders, removePageRefs, useV2TocPattern;
 
     private static String usageText;
 
@@ -31,6 +31,7 @@ public class FormatAtlantisHTML
         Option<Double> indentOpt = parser.addDoubleOption('i', "indent");
         Option<Boolean> pageRefsOpt = parser.addBooleanOption('p', "keep_page_refs");
         Option<Boolean> tocOpt = parser.addBooleanOption('t', "keep_TOC_leaders");
+        Option<Boolean> v2TocOpt = parser.addBooleanOption("--v2_TOC");
         Option<Boolean> helpOpt = parser.addBooleanOption('h', "help");
         Option<Boolean> guiOpt = parser.addBooleanOption("gui");
 
@@ -54,6 +55,7 @@ public class FormatAtlantisHTML
         indentAdjustment = parser.getOptionValue(indentOpt, 0.0).floatValue();
         listSpaces = parser.getOptionValue(listOpt, 0);
         removeTOCLeaders = !parser.getOptionValue(tocOpt, Boolean.FALSE).booleanValue();
+        useV2TocPattern = parser.getOptionValue(v2TocOpt, Boolean.FALSE).booleanValue();
         removePageRefs = !parser.getOptionValue(pageRefsOpt, Boolean.FALSE).booleanValue();
 
         if (parser.getOptionValue(guiOpt, Boolean.FALSE)) {
@@ -107,7 +109,8 @@ public class FormatAtlantisHTML
     }
 
     private static final Pattern fontSizePattern = Pattern.compile("font-size\\s{0,2}:\\s{0,2}(\\d[\\d\\.]*)pt");
-    private static final Pattern TOCDotPattern = Pattern.compile("\\.{15,}\\d+");
+    private static final Pattern TOCDotPattern_v1 = Pattern.compile("\\.{15,}\\d+");
+    private static final Pattern TOCDotPattern_v2 = Pattern.compile("\\.{15,}(.*\\D)\\d+(?=</a>)");
     private static final Pattern pageReferencePattern = Pattern.compile("\\s?\\(see p\\.\\d+\\)");
     private static final Pattern indentPattern =
         Pattern.compile("(text-indent|margin-left)\\s{0,2}:\\s{0,2}(-?\\d+(?:\\.\\d+)?)(pt|in)", Pattern.CASE_INSENSITIVE);
@@ -206,10 +209,18 @@ public class FormatAtlantisHTML
 
             // Remove TOC formatting
             if (removeTOCLeaders) {
-                m = TOCDotPattern.matcher(line);
-                if (m.find()) {
-                    line = m.replaceFirst("");
-                    continue;
+                if (!useV2TocPattern) {  // Atlantis version 1
+                    m = TOCDotPattern_v1.matcher(line);
+                    if (m.find()) {
+                        line = m.replaceFirst("");
+                        continue;
+                    }
+                } else { // Atlantis version 2
+                    m = TOCDotPattern_v2.matcher(line);
+                    if (m.find()) {
+                        line = m.replaceFirst(m.group(1));
+                        continue;
+                    }
                 }
             }
 

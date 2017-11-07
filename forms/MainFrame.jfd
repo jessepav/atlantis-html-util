@@ -63,7 +63,7 @@ new FormModel {
 			} )
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
 				"$columnSpecs": "right:default, labelcompgap, left:default, 12dlu, right:default, relgap, 25dlu"
-				"$rowSpecs": "default, relgap, default, unrelgap, default, relgap, default, relgap, default, unrelgap, default"
+				"$rowSpecs": "default, relgap, default, unrelgap, default, relgap, default, relgap, default, unrelgap, default, default"
 			} ) {
 				name: "panel1"
 				add( new FormComponent( "javax.swing.JLabel" ) {
@@ -201,6 +201,14 @@ new FormModel {
 					"gridWidth": 3
 					"gridX": 5
 				} )
+				add( new FormComponent( "javax.swing.JCheckBox" ) {
+					name: "v2TOCFixCheckBox"
+					"text": "Atlantis v2 TOC fix"
+				}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+					"gridY": 12
+					"gridWidth": 3
+					"gridX": 5
+				} )
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 2
 				"gridY": 6
@@ -230,7 +238,7 @@ new FormModel {
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 405, 335 )
+			"size": new java.awt.Dimension( 405, 370 )
 		} )
 	}
 }
