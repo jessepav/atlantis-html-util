@@ -1,14 +1,15 @@
 #Atlantis HTML Util properties
-#Mon Nov 06 19:18:06 EST 2017
+#Tue Nov 07 18:18:45 EST 2017
 font_size1=4
 list_spaces=0
 remove_page_refs=true
-output_file=C\:\\Code\\Projects\\atlantis-html-util\\trunk\\docs\\users-guide.html
+output_file=C\:\\Users\\JP\\Code\\Projects\\atlantis-html-util\\trunk\\docs\\users-guide.html
 indent=0
 body_width=750
 remove_TOC_leaders=true
 font_threshold3=20
 font_threshold2=17
+v2_TOC_fix=true
 font_threshold1=10
 font_size3=21
 font_size2=3
