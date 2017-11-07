@@ -4,7 +4,7 @@ new FormModel {
 	contentType: "form/swing"
 	root: new FormRoot {
 		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
-			"$columnSpecs": "unrelgap, default, labelcompgap, center:default, relgap, left:default:grow, unrelgap"
+			"$columnSpecs": "unrelgap, default, labelcompgap, center:default, relgap, right:default:grow, unrelgap"
 			"$rowSpecs": "unrelgap, default, linegap, default, 15dlu, default, 15dlu, default, unrelgap"
 		} ) {
 			name: "this"
@@ -218,6 +218,14 @@ new FormModel {
 				"text": "Process"
 			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
 				"gridX": 4
+				"gridY": 8
+			} )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "helpButton"
+				"text": "?"
+				"font": new java.awt.Font( "Tahoma", 1, 14 )
+			}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+				"gridX": 6
 				"gridY": 8
 			} )
 		}, new FormLayoutConstraints( null ) {

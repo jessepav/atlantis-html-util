@@ -9,6 +9,8 @@ import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
 import java.nio.file.*;
@@ -21,9 +23,11 @@ public class MainFrame implements ActionListener
     private JSpinner bodyWidthSpinner, indentSpinner, listSpacesSpinner;
     private JSpinner[] thresholdSpinners, sizeSpinners;
     private JCheckBox removePageRefsCheckBox, removeTOCLeadersCheckBox;
-    private JButton processButton;
+    private JButton processButton, helpButton;
 
     private JFileChooser chooser;
+
+    private static Desktop desktop;
 
     MainFrame() {
         try {
@@ -36,6 +40,7 @@ public class MainFrame implements ActionListener
             inputBrowseButton = cr.getButton("inputBrowseButton");
             outputBrowseButton = cr.getButton("outputBrowseButton");
             processButton = cr.getButton("processButton");
+            helpButton = cr.getButton("helpButton");
             bodyWidthSpinner = cr.getSpinner("bodyWidthSpinner");
             indentSpinner = cr.getSpinner("indentSpinner");
             listSpacesSpinner = cr.getSpinner("listSpacesSpinner");
@@ -50,7 +55,7 @@ public class MainFrame implements ActionListener
 
             initializeComponents();
 
-            JButton[] buttons = {inputBrowseButton, outputBrowseButton, processButton};
+            JButton[] buttons = {inputBrowseButton, outputBrowseButton, processButton, helpButton};
             for (JButton b : buttons)
                 b.addActionListener(this);
 
@@ -132,6 +137,19 @@ public class MainFrame implements ActionListener
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(frame, "Error processing file:\n\n" + ex.getMessage(),
                         "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } else if (source == helpButton) {
+            if (desktop == null) {
+                if (Desktop.isDesktopSupported()) {
+                    desktop = Desktop.getDesktop();
+                }
+            }
+            if (desktop != null) {
+                try {
+                    desktop.browse(new URI("https://jessepav.github.io/atlantis-html-util/users-guide.html"));
+                } catch (IOException|URISyntaxException e1) {
+                    JOptionPane.showMessageDialog(frame, "Unable to open a browser tab to display help");
                 }
             }
         }

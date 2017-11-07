@@ -7,3 +7,4 @@ manual-utils.iml
 manual-utils-build.*
 format-atlantis-html.install4j
 Atlantis HTML Util.jfdproj
+docs
