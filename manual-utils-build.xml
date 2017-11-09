@@ -63,6 +63,15 @@
     <pathelement location="${basedir}/lib/jargs.jar"/>
   </path>
   
+  <path id="library.jfd-loader.classpath">
+    <pathelement location="${basedir}/lib/jfd-loader.jar"/>
+  </path>
+  
+  <path id="library.jgoodies-forms-1.7.2.classpath">
+    <pathelement location="${basedir}/lib/jgoodies-common-1.8.1.jar"/>
+    <pathelement location="${basedir}/lib/jgoodies-forms-1.7.2.jar"/>
+  </path>
+  
   <!-- Modules -->
   
   
@@ -83,22 +92,30 @@
   
   <path id="manual-utils.module.production.classpath">
     <path refid="library.jargs.classpath"/>
+    <path refid="library.jfd-loader.classpath"/>
+    <path refid="library.jgoodies-forms-1.7.2.classpath"/>
   </path>
   
   <path id="manual-utils.runtime.production.module.classpath">
     <pathelement location="${manual-utils.output.dir}"/>
     <path refid="library.jargs.classpath"/>
+    <path refid="library.jfd-loader.classpath"/>
+    <path refid="library.jgoodies-forms-1.7.2.classpath"/>
   </path>
   
   <path id="manual-utils.module.classpath">
     <pathelement location="${manual-utils.output.dir}"/>
     <path refid="library.jargs.classpath"/>
+    <path refid="library.jfd-loader.classpath"/>
+    <path refid="library.jgoodies-forms-1.7.2.classpath"/>
   </path>
   
   <path id="manual-utils.runtime.module.classpath">
     <pathelement location="${manual-utils.testoutput.dir}"/>
     <pathelement location="${manual-utils.output.dir}"/>
     <path refid="library.jargs.classpath"/>
+    <path refid="library.jfd-loader.classpath"/>
+    <path refid="library.jgoodies-forms-1.7.2.classpath"/>
   </path>
   
   
@@ -114,6 +131,7 @@
     <dirset dir="${module.manual-utils.basedir}">
       <include name="src"/>
       <include name="resources"/>
+      <include name="forms"/>
     </dirset>
   </path>
   
@@ -138,6 +156,12 @@
     </copy>
     <copy todir="${manual-utils.output.dir}/resources">
       <fileset dir="${module.manual-utils.basedir}/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+    <copy todir="${manual-utils.output.dir}/com/humidmail/utils/manual">
+      <fileset dir="${module.manual-utils.basedir}/forms">
         <patternset refid="compiler.resources"/>
         <type type="file"/>
       </fileset>
