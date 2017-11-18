@@ -31,7 +31,7 @@ public class FormatAtlantisHTML
         Option<Double> indentOpt = parser.addDoubleOption('i', "indent");
         Option<Boolean> pageRefsOpt = parser.addBooleanOption('p', "keep_page_refs");
         Option<Boolean> tocOpt = parser.addBooleanOption('t', "keep_TOC_leaders");
-        Option<Boolean> v2TocOpt = parser.addBooleanOption("--v2_TOC");
+        Option<Boolean> v2TocOpt = parser.addBooleanOption("v2_TOC");
         Option<Boolean> helpOpt = parser.addBooleanOption('h', "help");
         Option<Boolean> guiOpt = parser.addBooleanOption("gui");
 
