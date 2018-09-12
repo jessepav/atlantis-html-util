@@ -2,12 +2,12 @@ Usage: FAHc.exe [options] <input html file> <output file> [<input> <output> ...]
 
 Options:
   -w,--width       <body width>
-  -t,--fontsize    <font_size_threshold #1,#2,#3>
-  -f,--threshold   <font_size_adjustment #1,#2,#3>
+  -f,--fontsize    <font_size_adjustment #1,#2,#3>
+  -t,--threshold   <font_size_threshold #1,#2,#3>
   -i,--indent      <indent and margin adjustment (in pt)>
   -l,--listspaces  <# of spaces>
   -p,--keep_page_refs
-  -t,--keep_TOC_leaders
+  -T,--keep_TOC_leaders
   --v2_TOC
   --gui
 

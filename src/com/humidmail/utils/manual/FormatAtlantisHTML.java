@@ -30,7 +30,7 @@ public class FormatAtlantisHTML
         Option<String> thresholdOpt = parser.addStringOption('t', "threshold");
         Option<Double> indentOpt = parser.addDoubleOption('i', "indent");
         Option<Boolean> pageRefsOpt = parser.addBooleanOption('p', "keep_page_refs");
-        Option<Boolean> tocOpt = parser.addBooleanOption('t', "keep_TOC_leaders");
+        Option<Boolean> tocOpt = parser.addBooleanOption('T', "keep_TOC_leaders");
         Option<Boolean> v2TocOpt = parser.addBooleanOption("v2_TOC");
         Option<Boolean> helpOpt = parser.addBooleanOption('h', "help");
         Option<Boolean> guiOpt = parser.addBooleanOption("gui");
@@ -114,7 +114,9 @@ public class FormatAtlantisHTML
     private static final Pattern pageReferencePattern = Pattern.compile("\\s?\\(see p\\.\\d+\\)");
     private static final Pattern indentPattern =
         Pattern.compile("(text-indent|margin-left)\\s{0,2}:\\s{0,2}(-?\\d+(?:\\.\\d+)?)(pt|in)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern listSpacesPattern = Pattern.compile("(?:&nbsp;|<p>)\\d+\\.(?=\\p{IsAlphabetic})");
+    private static final Pattern listSpacesPatterns[] =
+        {Pattern.compile("(?:&nbsp;|<[pb]>)\\d+\\.(?=\\p{Alpha})"),
+         Pattern.compile("<[pb]>\\d+(\\.\\d+)*\\.(?=</[pb]>)")};
 
     static String processFile(String inputFile, String outputFile) throws IOException {
         Path inputPath = Paths.get(inputFile);
@@ -183,14 +185,17 @@ public class FormatAtlantisHTML
 
             // Insert spaces in list items
             if (listSpaces > 0) {
-                m = listSpacesPattern.matcher(line);
-                if (m.find()) {
-                    sb.setLength(0);
-                    sb.append(line.substring(0,m.end()));
-                    for (int j = 0; j < listSpaces; j++)
-                        sb.append("&nbsp;");
-                    sb.append(line.substring(m.end()));
-                    line = sb.toString();
+                for (Pattern p : listSpacesPatterns) {
+                    m = p.matcher(line);
+                    if (m.find()) {
+                        sb.setLength(0);
+                        sb.append(line.substring(0,m.end()));
+                        for (int j = 0; j < listSpaces; j++)
+                            sb.append("&nbsp;");
+                        sb.append(line.substring(m.end()));
+                        line = sb.toString();
+                        break;
+                    }
                 }
             }
 
